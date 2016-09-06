@@ -9,6 +9,7 @@ module.exports = function ApiBuilder(components) {
 		customCorsHeaders,
 		unsupportedEventCallback,
 		authorizers,
+		userPoolAuthorizers,
 		interceptCallback,
 		prompter = (components && components.prompter) || require('./ask'),
 		isApiResponse = function (obj) {
@@ -103,6 +104,9 @@ module.exports = function ApiBuilder(components) {
 		}
 		if (authorizers) {
 			result.authorizers = authorizers;
+		}
+		if (userPoolAuthorizers) {
+			result.userPoolAuthorizers = userPoolAuthorizers;
 		}
 		return result;
 	};
@@ -235,5 +239,20 @@ module.exports = function ApiBuilder(components) {
 			throw new Error('Authorizer ' + name + ' is already defined');
 		}
 		authorizers[name] = config;
+	};
+	self.registerUserPoolAuthorizer = function (name, config) {
+		if (!name || typeof name !== 'string' || name.length === 0) {
+			throw new Error('User pool authorizer must have a name');
+		}
+		if (!config || typeof config !== 'object' || Object.keys(config).length === 0) {
+			throw new Error('User pool authorizer ' + name + ' configuration is invalid');
+		}
+		if (!userPoolAuthorizers) {
+			userPoolAuthorizers = {};
+		}
+		if (userPoolAuthorizers[name]) {
+			throw new Error('User pool authorizer ' + name + ' is already defined');
+		}
+		userPoolAuthorizers[name] = config;
 	};
 };
